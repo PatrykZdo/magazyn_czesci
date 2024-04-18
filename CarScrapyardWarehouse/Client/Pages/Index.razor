@@ -1,0 +1,94 @@
+﻿@page "/"
+@namespace MudBlazor
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+
+
+<PageTitle>PartHub</PageTitle>
+<MudStack Justify="Justify.SpaceAround">
+	
+	<MudStack AlignItems="AlignItems.Center" Style="margin-top:50px;">
+
+		<MudText Typo="Typo.h3" Style="font-family: 'Courier New', monospace; font-weight:bold;font-size:100px;">Part<spam style="color:rgb(89 74 226);">Hub</spam></MudText>
+		<MudImage Src="images/warehouse.png" Style="position:relative; z-index:0;"></MudImage>
+		
+		<MudStack Style="background-color:rgba(255,255,255,0.2); color:rgb(255,255,255);border-radius:20px; z-index:1; padding:20px 30px 20px 30px; max-width:800px; margin:0px 20px;">
+			<MudText Typo="Typo.h4" Style="font-weight:bold; font-family: 'Courier New', monospace; text-align:center; z-index:2;" >Czas zadbać o swój Magazyn</MudText>
+			<MudText Typo="Typo.h5" Style="font-family: 'Courier New'; text-align:justify; z-index:2;">Kup najlepsze oprogramowanie do magazynowania części używanych pochodzących z każdego rodzaju pojazdów. PartHub umożliwi ci zaoszczędzić godziny w poszukiwaniu konkretnej części.</MudText>
+			<MudButton Variant="Variant.Filled" @onclick="ScrollToShoppingSection"  StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" Color="Color.Warning" Size="Size.Large" Style="width:180px; align-self:center;" >Kup Teraz</MudButton>
+		</MudStack>
+
+	</MudStack>
+	
+	<MudStack Style="height:30%; background-color:rgb(89 74 226); position:absolute; top:510px; z-index:-1; width:100vw;"></MudStack>
+	
+	<MudStack Row=true Justify="Justify.SpaceAround" Style="margin-top:50px;" Class="flex-wrap">
+		<MudCard Style="width:300px; box-shadow:0px -5px 5px 5px white; background-color:rgb(51 50 62);color:white; " >
+			<MudCardMedia Image="images/tractor_in_warehouse.png" Height="300" Style="width:300px;"/>
+			<MudCardContent>
+				<MudText Typo="Typo.h5">Elastyczność</MudText>
+				<MudText Typo="Typo.body2">Oprogramowanie daje możliwość dopasowania wszystkich aspektów przechowywania części.</MudText>
+				<MudText Typo="Typo.body2">Sam sobie definiujesz swoje Magazyny oraz jakie informacje o pojazdach chcesz przechowywać</MudText>
+			</MudCardContent>
+		</MudCard>
+
+		<MudCard Style="width:300px; box-shadow:0px -5px 5px 5px white; background-color:rgb(51 50 62);color:white;">
+			<MudCardMedia Image="images/warehouse_worker_with_tires.png" Height="300" Style="width:300px;"/>
+			<MudCardContent>
+				<MudText Typo="Typo.h5">Dbałość</MudText>
+				<MudText Typo="Typo.body2">Dzięki naszej aplikacji dbasz o czystość w swoich magazynach.</MudText>
+				<MudText Typo="Typo.body2">Korzystając z naszego oprogramowania dbasz też o swoich pracowników. Zaoszczędzony czas na szukanie części zwróci się z nawiązkom</MudText>
+			</MudCardContent>
+		</MudCard>
+
+		<MudCard Style="width:300px; box-shadow:0px -5px 5px 5px white; background-color:rgb(51 50 62);color:white;">
+			<MudCardMedia Image="images/mini_in_warehouse.png" Height="300" Style="width:300px;"/>
+			<MudCardContent>
+				<MudText Typo="Typo.h5">Łatwość</MudText>
+				<MudText Typo="Typo.body2">Wystawianie ogłoszeń sprzedaży jeszcze nigdy nie było tak proste.</MudText>
+				<MudText Typo="Typo.body2">Wystarczą trzy kliknięcia i twój produkt jest już wystawiony na sprzedaż w wybranym portalu ogłoszeniowym. </MudText>
+			</MudCardContent>
+		</MudCard>
+
+	</MudStack>
+	<MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="position:relative; top:-100px;">
+		<MudText Style="font-family:Impact, fantasy;font-style:italic; font-size:290px; color:rgba(120,120,120,0.4); letter-spacing:45px; z-index:-1; position:relative; top:150px;">SKLEP</MudText>
+		<MudStack Row=true Style="width:80%" Justify="Justify.SpaceBetween">
+			<MudImage Src="images/computer_screen.png" Style="height:auto; width:40%;"></MudImage>
+			<MudStack Style="padding:0px 30px 0px 30px;">
+				<MudText Typo="Typo.h2" Style="font-family: 'Courier New', monospace; font-weight:bold;"> <spam>Part<spam style="color:rgb(89 74 226);">Hub</spam></spam> shop</MudText>
+				<MudText Style="font-family: 'Courier New'; font-weight:bold;">Dobrze wiemy że w dzisiejszych czasach większość zakupów wykonuje się przez internet. Dlatego wyciągamy dłoń do naszych klientów i z dumą pragniemy poinformować że każdy użytkownik oprogramowania "PartHub" może całkowicie za darmo wystawiać na sprzedaż swoje prdukty.</MudText>
+			</MudStack>
+		</MudStack>
+	</MudStack>
+	<MudStack id="shopping-section" Row=true Justify="Justify.SpaceAround" Style="font-family: 'Courier New', monospace;text-align:center; margin-bottom:150px;" Class="flex-wrap">
+		<MudPaper Outlined=true Style="background-color:rgba(255,152,0,1); box-shadow:0px 10px 10px 5px rgba(51,50,62,0.3);">
+			<MudText Typo="Typo.h5" Style="margin:20px; font-weight:800;"> 5 Użytkowników</MudText>
+			<MudImage Src="images\5_people.png" Height="250" Width="300"/>
+			<MudText Typo="Typo.h3" Style="margin-top:20px;margin-bottom:0px;">799<spam style="font-size:20px;">zł/<spam style="color:rgb(89 74 226);">rok</spam ></spam></MudText>
+			<MudButton Variant="Variant.Filled" Style="margin:20px 0px 30px 0px; background-color:rgba(51,50,62,0.8); color:white;">Kup teraz</MudButton>
+		</MudPaper>
+		<MudPaper Outlined=true Style="background-color:rgba(255,152,0,1); box-shadow:0px 10px 10px 5px rgba(51,50,62,0.3);">
+			<MudText Typo="Typo.h5" Style="margin:20px; font-weight:800;"> 10 Użytkowników</MudText>
+			<MudImage Src="images\10_people.png" Height="250" Width="300"/>
+			<MudText Typo="Typo.h3" Style="margin-top:20px;margin-bottom:0px;">999<spam style="font-size:20px;">zł/<spam style="color:rgb(89 74 226);">rok</spam ></spam></MudText>
+			<MudButton Variant="Variant.Filled" Style="margin:20px 0px 30px 0px; background-color:rgba(51,50,62,0.8); color:white;">Kup teraz</MudButton>
+		</MudPaper>
+		<MudPaper Outlined=true Style="background-color:rgba(255,152,0,1); box-shadow:0px 10px 10px 5px rgba(51,50,62,0.3);">
+			<MudText Typo="Typo.h5" Style="margin:20px; font-weight:800;"> Bez Ograniczeń</MudText>
+			<MudImage Src="images\over_100_people.png" Height="250" Width="300" />
+			<MudText Typo="Typo.h3" Style="margin-top:20px;margin-bottom:0px;">1499<spam style="font-size:20px;">zł/<spam style="color:rgb(89 74 226);">rok</spam ></spam></MudText>
+			<MudButton Variant="Variant.Filled" Style="margin:20px 0px 30px 0px; background-color:rgba(51,50,62,0.8); color:white;">Kup teraz</MudButton>
+		</MudPaper>
+	</MudStack>
+</MudStack>
+
+
+
+@code{
+
+	private async Task ScrollToShoppingSection()
+	{
+		await JSRuntime.InvokeVoidAsync("scrollToElement", "#shopping-section");
+	}
+}

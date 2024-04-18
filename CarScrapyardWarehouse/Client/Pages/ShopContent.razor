@@ -1,0 +1,139 @@
+﻿@page "/shopcontent"
+
+@using CarScrapyardWarehouse.Client.Interfaces
+@using CarScrapyardWarehouse.Client.Shared
+@using CarScrapyardWarehouse.Shared.Models
+
+<PageTitle>Sklep PartHub</PageTitle>
+
+<h3>ShopContent</h3>
+
+<MudButton Href="shop">Wróć na main</MudButton>
+
+
+@if (!IsLoading)
+{
+<MudContainer Fixed="true" Class="d-flex" Style="position: absolute; right: 0;">
+    <MudPaper Style="position: fixed; left: 10px; width: 250px">
+        <MudList Clickable="true" @bind-SelectedItem="selectedItem" @bind-SelectedValue="selectedValue">
+            <MudListSubheader>
+                Your drink:
+                <MudChip Color="Color.Secondary">
+                    @(selectedItem?.Text ?? "You are dry") (@(selectedValue?.ToString() ?? "0"))
+                </MudChip>
+            </MudListSubheader>
+            <MudListItem Text="Sparkling Water" Value="1" />
+            <MudListItem Text="Teas">
+                <NestedList>
+                    <MudListItem Text="Earl Grey" Value="2" />
+                    <MudListItem Text="Matcha" Value="3" />
+                    <MudListItem Text="Pu'er" Value="4" />
+                </NestedList>
+            </MudListItem>
+            <MudListItem Text="Coffees">
+                <NestedList>
+                    <MudListItem Text="Irish Coffee" Value="5" />
+                    <MudListItem Text="Double Espresso" Value="6" />
+                    <MudListItem Text="Cafe Latte" Value="7" />
+                </NestedList>
+            </MudListItem>
+            <MudListItem Text="Coffees">
+                <NestedList>
+                    <MudListItem Text="Irish Coffee" Value="5" />
+                    <MudListItem Text="Double Espresso" Value="6" />
+                    <MudListItem Text="Cafe Latte" Value="7" />
+                </NestedList>
+            </MudListItem>
+        </MudList>
+    </MudPaper>
+
+    <div class="flex-grow-1 ml-2">
+        <MudGrid>
+            @foreach(var item in parts)
+            {
+                <MudItem xs="3">
+                    <MudCard Elevation="10">
+                        <MudCardMedia Image="" Height="250" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@item.Name</MudText>
+                                <MudText Typo="Typo.body1">Kategoria części:
+                                    @foreach (var category in categories)
+                                {
+                                    if (category.Id == item.IdCategory)
+                                    {
+                                        @category.CategoryName
+                                        break; // Przerwij pętlę po znalezieniu pasującej kategorii
+                                    }
+                                }
+                                </MudText>
+                        </MudCardContent>
+                        <MudCardActions Class="d-flex flex-column align-items-start">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="width: 100%">Kup</MudButton>
+                            <MudText Class="my-2" Typo="Typo.body2">Dostępne: 25 szt.</MudText>
+                            <MudText Class="my-2" Typo="Typo.body2">Wysyłka / Odbiór: </MudText>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </div>
+
+</MudContainer>
+    }
+    else
+    {
+    <MudStack Style="padding-top: 100px" AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+    </MudStack>
+    }
+
+
+@code {
+    MudListItem selectedItem;
+    object selectedValue = 1;
+    bool earlGreyChecked = true;
+    public bool IsLoading { get; set; }
+
+    public IEnumerable<Part> parts = new List<Part>();
+    public IEnumerable<PartsCategory> categories = new List<PartsCategory>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        await GetAllData();
+        IsLoading = false;
+    }
+
+    public void ShowData()
+    {
+        foreach(var item in categories)
+        {
+            Console.WriteLine(item.CategoryName);
+        }
+    }
+
+    public async Task GetAllData()
+    {
+        try
+        {
+            await GetParts();
+            await GetPartsCategory();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    public async Task GetParts()
+    {
+        parts = await VehicleService.GetParts();
+    }
+
+    public async Task GetPartsCategory()
+    {
+        categories = await VehicleService.GetPartsCategories();
+    }
+
+
+}

@@ -1,0 +1,34 @@
+﻿<style>
+    .navLink {
+        color: white;  
+    }
+
+    .mud-nav-link-text:hover {
+        color: black;
+    }
+
+    .mud-nav-link:hover {
+        color: black;
+    }
+
+    
+</style>
+
+<MudNavMenu Color=Color.Inherit Bordered Style="background: linear-gradient(to bottom left, #77dd77, #000000); height: 100vh">
+    <MudNavLink Class="navLink"  Href="/" Match="NavLinkMatch.All">Strona Główna</MudNavLink>
+     <MudNavLink Class="navLink" Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
+     <MudNavLink Class="navLink" Href="/reciving-material" Match="NavLinkMatch.Prefix">Przyjęcie Cześci</MudNavLink>
+     <MudNavLink Class="navLink" Href="/fetchdata" Match="NavLinkMatch.Prefix">Przyjęcie Samochodu</MudNavLink>
+     <MudNavLink Class="navLink" Href="/locations" Match="NavLinkMatch.Prefix">Dodawanie Lokalizacji</MudNavLink>
+     <MudNavLink Class="navLink" Href="/carparts" Match="NavLinkMatch.Prefix">Wszystkie części</MudNavLink>
+     <MudNavLink Class="navLink" Href="/partdetails" Match="NavLinkMatch.Prefix">Szczegóły części</MudNavLink>
+     <MudNavLink Class="navLink" Href="/shop" Match="NavLinkMatch.Prefix">Sklep</MudNavLink>
+     <MudNavGroup Class="navLink" Title="Settings" Expanded="true">
+         <MudNavLink Class="navLink" Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+         <MudNavLink Class="navLink" Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>
+     <MudNavLink Class="navLink" Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
+</MudNavMenu>
+@code {
+    public static string Black { get; } = "#000000";
+}

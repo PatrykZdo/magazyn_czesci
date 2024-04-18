@@ -1,0 +1,82 @@
+﻿@page "/partdetails"
+
+<PageTitle>Szczegóły części</PageTitle>
+
+@using CarScrapyardWarehouse.Shared.Models
+@using System.Net.Http.Json
+@using System.Net.Http
+@using Newtonsoft.Json
+@inject HttpClient HttpClient
+
+<MudContainer Class="mt-4">
+    <MudGrid Justify="Justify.Center">
+        <MudItem Class="d-flex justify-content-between align-items-center">
+            <MudTextField @bind-Value="@PartId" Label="ID części" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" @onclick="() => LoadPartData(PartId)">Pobierz dane części</MudButton>
+        </MudItem>
+    </MudGrid>
+
+    @if (PartData != null)
+    {
+        <MudGrid Justify="Justify.Center" Class="mt-4">
+            <MudItem xs="12" md="6">
+                <h3>Informacje o części</h3>
+                <p>Nazwa części: @PartData.Part</p>
+                <p>Marka: @PartData.Brand</p>
+                <p>Model: @PartData.Model</p>
+                <p>Rocznik: @PartData.Rocznik</p>
+                <p>Opis: @PartData.Description</p>
+                @*<p>Magazyn: @PartData.Magazine</p>
+                <p>Obszar: @PartData.Area</p>*@
+                <p>Pozycja: @PartData.Position</p>
+            </MudItem>
+        </MudGrid>
+    } 
+</MudContainer>
+
+@code {
+    private string PartId { get; set; }
+
+    private PartsData PartData = null;
+    private Part part { get; set; }
+    private Vehicle vehicle { get; set; }
+    private Warehouse warehouse { get; set; }
+    private CarScrapyardWarehouse.Shared.Models.Position position { get; set; }
+    private Area area { get; set; }
+
+    public async Task LoadPartData(string partId)
+    {
+        try
+        {
+            int pId;
+            try
+            {
+                if (!int.TryParse(partId, out pId))
+                    pId = JsonConvert.DeserializeObject<PartsData>(partId).Id;
+            }
+            catch (Exception)
+            {
+                pId = 0;
+            } 
+
+            part = await VehicleService.GetPartById(pId);
+            vehicle = await VehicleService.GetVehicleById(part.IdVehicle ?? 0);
+
+            if(part != null)
+            {
+                PartData = new PartsData();
+                PartData.Part = part.Name;
+                PartData.Description = part.Description;
+                PartData.Brand = vehicle.Brand;
+                PartData.Model = vehicle.Model;
+                PartData.Rocznik = vehicle.Year;
+                PartData.Position = "pos";
+                Console.WriteLine(PartData.Part);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}

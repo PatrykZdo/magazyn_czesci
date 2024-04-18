@@ -1,0 +1,234 @@
+﻿<style>
+    .topNav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+
+        height: 120px;
+    }
+
+    .info--navbar, .searchbox--navbar, .icons--navbar {
+        display: flex;
+        align-items: center;
+        min-width: 200px;
+    }
+
+        .info--navbar p {
+            margin: 0 10px;
+            height: 100%;
+        }
+
+    .searchbox--navbar {
+        flex-grow: 1;
+        margin: 0 10px;
+        max-width: 300px;
+    }
+
+    .icons--navbar {
+        justify-content: space-around;
+    }
+
+    .search-button--navbar {
+        background-color: #77dd77;
+        width: 40px;
+        height: 40px;
+    }
+
+    .carousel-item {
+        background-color: rgba(0, 0, 0, 0.2);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        position: relative;
+    }
+</style>
+
+@page "/shop"
+
+@using CarScrapyardWarehouse.Client.Interfaces
+@using CarScrapyardWarehouse.Client.Shared
+@using CarScrapyardWarehouse.Shared.Models
+
+<PageTitle>Shop</PageTitle>
+
+@if(!IsLoading)
+{
+    <MudContainer Fixed="true">
+        <div class="topNav">
+            <div class="info--navbar">
+                <MudIcon Icon="@Icons.Material.Filled.Phone" Size="Size.Large"></MudIcon>
+                <p>+48 123 456 789</p>
+            </div>
+            <div class="searchbox--navbar">
+                <MudTextField @bind-Value="TextValue" Label="Szukaj" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+                <MudButton class="search-button--navbar"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></MudButton>
+            </div>
+            <div class="icons--navbar">
+                <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Size="Size.Large"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Size="Size.Large"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalanceWallet" Size="Size.Large"></MudIcon>
+            </div>
+        </div>
+
+        <MudCarousel Class="mud-width-full"
+                     @ref="_carousel"
+                     ItemsSource="@imagePaths"
+                     SelectedIndex="2"
+                     Style="height:400px;"
+                     ShowArrows=true
+                     ShowBullets=true
+                     EnableSwipeGesture=true
+                     AutoCycle=true>
+            <ItemTemplate>
+                <div class="carousel-item">
+                    <MudImage Src="@context" />
+                    @if (_carousel.SelectedIndex == 2)
+                    {
+                        <div class="overlay" style="position: absolute; top: 50%; left: 0; transform: translate(0, -50%); width: 20%; text-align: center;">
+                            <MudButton Variant="Variant.Text">Darmowa wysyłka</MudButton>
+                        </div>
+                    }
+                    <div class="caption" style="position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px;">
+                        <MudText Align="@Align.Center">@captions[_carousel.SelectedIndex]</MudText>
+                        </div>
+                    </div>
+                </ItemTemplate>
+            </MudCarousel>
+
+            <MudText Typo="Typo.h5" style="margin: 6px">Popularne kategorie</MudText>
+
+            <MudGrid Spacing="1">
+                 @foreach (var i in categories)
+            @*@for(int i=0; i< 12; i++)*@
+            {
+                <MudItem>
+                    <MudPaper Height="190px" Width="190px" Square="true" Style="background-color: lightgray; position: relative;">
+                        <MudText Typo="Typo.h5" style="margin: 6px; position: absolute; bottom: 5px; left: 10px; color: whitesmoke">Kategoria</MudText>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudText Typo="Typo.h5" style="margin: 6px">Popularne modele samochodów</MudText>
+
+        <MudGrid Spacing="1">
+             @foreach (var item in displayedVehicles)
+            @* @for (int i = 0; i < 12; i++)*@
+            {
+                <MudItem>
+                    <MudPaper Height="50px" Width="190px" Square="true" Style="background-color: whitesmoke; display: flex; justify-content: space-between; align-items: center;">
+                        <MudText Typo="Typo.h6" style="margin: 6px;">@item.Brand</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowForwardIos"></MudIcon>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+
+
+        <MudButton Href="shopcontent">Przekieruj mnie</MudButton>
+        <MudButton OnClick="showData">Write konsole</MudButton>
+
+    </MudContainer>
+}
+else
+{
+    <MudStack Style="padding-top: 100px" AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+    </MudStack>
+}
+
+
+
+
+
+
+@code {
+
+    private MudCarousel<string> _carousel;
+
+    public string TextValue { get; set; }
+    private int selectedIndex = 2;
+
+    public bool IsLoading { get; set; }
+    private bool _arrows = true;
+    private bool _bullets = true;
+    private bool _enableSwipeGesture = true;
+    private bool _autocycle = true;
+
+    public IEnumerable<PartsCategory> categories = new List<PartsCategory>();
+    public IEnumerable<Vehicle> vehicles = new List<Vehicle>();
+
+    public List<PartsCategory> displayedCategories = new List<PartsCategory>();
+    public List<Vehicle> displayedVehicles = new List<Vehicle>();
+
+    private List<string> captions = new List<string> { "Kupuj lokalnie", "Najniższe ceny", "Juhuuu" };
+    private List<string> imagePaths = new List<string>{
+    "/images/carouselParts1.png",
+    "/images/carouselParts2.png",
+    "/images/carouselParts3.png",
+};
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        await GetAllData();
+        IsLoading = false;
+    }
+
+    public async Task GetAllData()
+    {
+        try
+        {
+            await GetPartsCategory();
+            await GetVehicles();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    public void showData()
+    {
+        Console.WriteLine("SHIT");
+    }
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        TextValue = e.Value.ToString();
+    }
+
+    public async Task GetPartsCategory()
+    {
+        try
+        {
+            categories = await VehicleService.GetPartsCategories();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Wystąpił błąd podczas pobierania kategorii części: " + ex.Message);
+        }
+    }
+
+    public async Task GetVehicles()
+    {
+        try
+        {
+            vehicles = await VehicleService.GetVehicles();
+            Console.WriteLine(string.Join("", vehicles));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Wystąpił błąd podczas pobierania pojazdów: " + ex.Message);
+        }
+    }
+
+}
+
+
+        

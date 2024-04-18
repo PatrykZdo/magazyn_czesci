@@ -1,0 +1,187 @@
+﻿@page "/carparts"
+
+@using System.Net.Http.Json
+@using CarScrapyardWarehouse.Client.Interfaces
+@using CarScrapyardWarehouse.Client.Shared
+@using CarScrapyardWarehouse.Shared.Models
+@using Newtonsoft.Json
+@inject IDialogService DialogService
+@inject HttpClient httpClient
+
+
+<PageTitle>Wyszukaj części</PageTitle>
+
+    @if (!IsLoading)
+{
+    <MudDataGrid
+    T="PartsData"
+    Items=@Elements
+                 SortMode="SortMode.Multiple"
+                 Filterable="true"
+                 QuickFilter="@_quickFilter"
+                  ReadOnly="true"
+    Hover=true
+>
+
+        <ToolBarContent>
+                <MudText Class="w-auto" Typo="Typo.h6">Wszystkie części</MudText>
+                <MudSpacer />
+            <MudTextField @bind-Value="_searchString" 
+            Placeholder="Search" 
+            Adornment="Adornment.Start" 
+            AdornmentIcon="@Icons.Material.Filled.Search" 
+            IconSize="Size.Medium"
+            Immediate=true
+            Class="mt-0"></MudTextField>
+    </ToolBarContent>
+
+    <Columns>
+            <HierarchyColumn T="PartsData" />
+            <PropertyColumn Property="x => x.Part" Title="Część" />
+            <PropertyColumn Property="x => x.Brand" Title="Marka" />
+            <PropertyColumn Property="x => x.Model" Title="Model" />
+            <PropertyColumn Property="x => x.Magazine + ' ' + x.Area + ' ' + x.Position" Title="Miejsce na magazynie" />
+            <TemplateColumn CellClass="d-flex justify-end" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    <MudStack Row>
+                     <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary"><MudIcon Icon="@Icons.Material.Filled.Edit"></MudIcon></MudButton>
+                     <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Error"><MudIcon Icon="@Icons.Material.Filled.Delete"></MudIcon></MudButton>
+                 </MudStack>
+             </CellTemplate>
+         </TemplateColumn>
+    </Columns>
+        <ChildRowContent>
+            <MudCard>
+                    <MudCardContent Class="d-flex justify-content-between align-items-center">
+                        <div style="max-width: 40%">
+                            <MudText Typo="Typo.h6">@context.Item.Part</MudText>
+                            <MudText>Opis: @context.Item.Description</MudText>
+                        </div>
+                        <div style="max-width: 60%">
+                            <MudImage Src="/images/LogoNoBackground.png" Alt="Fotka" Style="height: 80%; width: 20%"/>
+                            <MudImage Src="/images/LogoNoBackground.png" Alt="Fotka" Style="height: 80%; width: 20%"/>
+                            <MudImage Src="/images/LogoNoBackground.png" Alt="Fotka" Style="height: 80%; width: 20%"/>
+                            <MudBarcode Value="@(ConvertToJSON(context.Item))" Width="90" Height="90" BarcodeFormat="ZXing.BarcodeFormat.QR_CODE" />
+                        </div>     
+                    </MudCardContent>
+                </MudCard>
+            </ChildRowContent>
+        <PagerContent>
+            <MudDataGridPager T="PartsData"/>
+        </PagerContent>
+    </MudDataGrid>
+} else
+{
+    <MudStack Style="padding-top: 100px" AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+    </MudStack>
+}
+
+
+
+@code {
+
+    private bool open { get; set; }
+    private bool IsFiltersShown = false;
+    public bool IsLoading { get; set; }
+    public string _searchString;
+    private bool _sortNameByLength;
+
+    private PartsData selectedItem1 = null;
+    private List<string> filterKeysArray = new List<string>();
+
+    public IEnumerable<Part> parts = new List<Part>();
+    public IEnumerable<Vehicle> cars = new List<Vehicle>();
+    public IEnumerable<Warehouse> warehouses = new List<Warehouse>();
+    public IEnumerable<CarScrapyardWarehouse.Shared.Models.Position> positions = new List<CarScrapyardWarehouse.Shared.Models.Position>();
+    public IEnumerable<Area> areas = new List<Area>();
+
+    public List<Part> SelectedParts = new List<Part>();
+    private List<PartsData> Elements = new List<PartsData>();
+
+    // Initialization process
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        await GetAllData();
+        IsLoading = false;
+    }
+
+    protected string ConvertToJSON(PartsData item) => JsonConvert.SerializeObject(item);
+
+    // Filter functions
+
+    private Func<PartsData, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        return false;
+    };
+
+    // Helper functions
+
+    public async Task GetAllData()
+    {
+        try
+        {
+            await GetData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    public async Task GetData()
+    {
+        parts = await VehicleService.GetParts();
+        cars = await VehicleService.GetVehicles();
+        warehouses = await WarehouseService.GetWarehouses();
+        areas = await WarehouseService.GetAreas();
+        positions = await WarehouseService.GetPositions();
+
+        foreach (var part in parts)
+        {
+            if (part.IdVehicle != 0) // Sprawdź, czy część jest przypisana do pojazdu
+            {
+                var vehicle = cars.FirstOrDefault(c => c.Id == part.IdVehicle);
+                var position = positions.FirstOrDefault(p => p.Id == part.IdPosition);
+                var area = areas.FirstOrDefault(a => a.Id == position.IdArea);
+                var warehouse = warehouses.FirstOrDefault(w => w.Id == area.IdWarehouse);
+                if (vehicle != null) // Sprawdź, czy pojazd został znaleziony
+                {
+                    var brandName = vehicle.Brand;
+                    var modelName = vehicle.Model;
+                    var warehouseName = warehouse.WarehouseName;
+                    var areaName = area.AreaName;
+                    var positionName = position.PositionName;
+
+                    var partData = new PartsData
+                        {
+                            Id = part.Id,
+                            Part = part.Name,
+                            Description = part.Description,
+                            Brand = brandName,
+                            Model = modelName,
+                            Magazine = warehouseName,
+                            Area = areaName,
+                            Position = positionName,
+                        };
+                    Console.WriteLine(partData);
+                    Elements.Add(partData);
+                }
+            }
+            else
+            {
+                var partData = new PartsData
+                    {
+                        Part = part.Name,
+                        Description = part.Description
+                    };
+                Elements.Add(partData);
+            }
+        }
+    }
+}
